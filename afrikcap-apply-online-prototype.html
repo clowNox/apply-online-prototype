@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AfrikCap Apply Online Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* VOICE work: a shipped field-agent app, calm and exact
+   IDEA the AfrikCap agent form as it should behave, fixes built in
+   PICTURE the live form itself: fixed 8-step rail, one calm column, live checks
+   COLOUR AfrikCap green #17634c on white/stone, amber for flags, red for blocks
+   TYPE IBM Plex Sans throughout, weights for hierarchy
+   LAYOUT laptop: top bar, step rail left, form column right, sticky footer; phone: scrolling step strip above the form */
+:root{color-scheme:light dark;--bg:light-dark(#f3f2ee,#121614);--panel:light-dark(#ffffff,#1b201e);--ink:light-dark(#18201d,#e8ece9);--mute:light-dark(#5f6a65,#9aa6a0);--line:light-dark(#dcdcd5,#2e3633);--g:light-dark(#17634c,#5fc39c);--gs:light-dark(#e6f1ec,#1d3029);--amb:light-dark(#9a5b00,#f0b45a);--ambs:light-dark(#fdf3e2,#33281a);--red:light-dark(#b3261e,#ff8a80);--reds:light-dark(#fbeceb,#3a1f1e)}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.5 "IBM Plex Sans",system-ui,sans-serif;overflow-x:clip}
+button,input,select,textarea{font:inherit;color:inherit}
+.top{position:sticky;top:0;z-index:5;background:var(--panel);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:10px max(3vw,16px)}
+.logo{display:flex;align-items:center;gap:8px;font-weight:700;font-size:20px;color:var(--g)}
+.logo b{background:var(--g);color:var(--panel);width:30px;height:30px;border-radius:6px;display:grid;place-items:center;font-size:18px}
+.sp{flex:1}
+.pill{font-size:14px;padding:5px 12px;border-radius:99px;background:var(--bg);border:1px solid var(--line);white-space:nowrap}
+.sw{display:flex;align-items:center;gap:8px;font-size:14px;cursor:pointer;min-height:44px}
+.sw input{width:20px;height:20px;accent-color:var(--g)}
+.wrap{display:grid;grid-template-columns:260px minmax(0,1fr);max-width:1240px;margin:0 auto}
+.rail{padding:22px 12px;position:sticky;top:66px;align-self:start}
+.rail ol{list-style:none;margin:0;padding:0}
+.rail button{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:none;border:0;padding:10px 12px;border-radius:10px;cursor:pointer;font-weight:500;min-height:44px}
+.rail button[aria-current=step]{background:var(--gs);color:var(--g);font-weight:600}
+.dot{width:28px;height:28px;flex:none;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;font-size:13px;font-weight:600}
+.done .dot{background:var(--g);border-color:var(--g);color:var(--panel)}
+.flag .dot{border-color:var(--amb);color:var(--amb)}
+main{padding:24px max(3vw,16px) 120px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:clamp(18px,3vw,32px);max-width:860px}
+h1{font-size:clamp(28px,3.4vw,38px);line-height:1.08;letter-spacing:-.02em;margin:0}
+.sub{color:var(--mute);margin:4px 0 0}
+.notes{margin:18px 0 0;padding:12px 16px;border-radius:10px;background:var(--gs);font-size:15px}
+.notes b{color:var(--g)}
+.notes ul{margin:6px 0 0;padding-left:20px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:20px 24px;margin-top:24px}
+.full{grid-column:1/-1}
+.f label{display:block;font-weight:600}
+.f .req{font-weight:400;color:var(--mute);font-size:14px}
+.lg{color:var(--mute);font-size:14px;margin-bottom:6px}
+.in,select,textarea{width:100%;min-height:48px;padding:10px 12px;border:1.5px solid var(--line);border-radius:10px;background:var(--panel);font-size:16px}
+textarea{min-height:90px}
+.in:focus,select:focus,textarea:focus,button:focus-visible{outline:3px solid color-mix(in srgb,var(--g) 40%,transparent);outline-offset:1px;border-color:var(--g)}
+.bad .in,.bad select{border-color:var(--red)}
+.pre{display:flex}.pre span{display:grid;place-items:center;padding:0 12px;border:1.5px solid var(--line);border-right:0;border-radius:10px 0 0 10px;background:var(--bg);font-weight:600}.pre .in{border-radius:0 10px 10px 0}
+.hint{font-size:14px;color:var(--mute);margin-top:6px}
+.err{font-size:14px;color:var(--red);font-weight:600;margin-top:4px}
+.err:empty{display:none}
+.ok{color:var(--g);font-weight:600}
+.warn{color:var(--amb);font-weight:600}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{min-height:44px;padding:8px 16px;border:1.5px solid var(--line);border-radius:10px;background:var(--panel);cursor:pointer;font-weight:600}
+.chip[aria-pressed=true]{border-color:var(--g);background:var(--gs);color:var(--g)}
+.who{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.who .chip{text-align:left;padding:16px 18px;font-size:18px}
+.who small,.prod small{display:block;font-weight:400;color:var(--mute);font-size:14px}
+.prods{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,230px),1fr));gap:12px}
+.prod{text-align:left;padding:14px 16px;border:1.5px solid var(--line);border-radius:12px;background:var(--panel);cursor:pointer;min-height:44px}
+.prod b{font-size:17px}
+.prod[aria-pressed=true]{border-color:var(--g);background:var(--gs)}
+.tag{font-size:12px;font-weight:600;color:var(--g);background:var(--gs);border-radius:6px;padding:2px 8px;margin-left:6px}
+.sec{font-size:18px;margin:30px 0 0;padding-top:20px;border-top:1px solid var(--line)}
+.inline{border-left:3px solid var(--g);padding-left:18px;margin-top:4px}
+.decode{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.decode span{font-size:13px;padding:3px 9px;border-radius:6px;background:var(--bg);border:1px solid var(--line)}
+.nbox{display:flex;gap:3px;margin-top:8px;flex-wrap:wrap}
+.nbox i{font-style:normal;width:24px;height:30px;display:grid;place-items:center;border-radius:5px;font-weight:700;font-size:14px;border:1.5px solid var(--line)}
+.nbox .g1{border-color:var(--g);color:var(--g)}.nbox .g2{border-color:#2b5fb4;color:#2b5fb4}.nbox .g3{border-color:var(--amb);color:var(--amb)}.nbox .g4{border-color:#7a4fa8;color:#7a4fa8}
+.loan{border:1px solid var(--line);border-radius:12px;padding:14px;margin-top:12px}
+.link{background:none;border:0;color:var(--g);font-weight:600;cursor:pointer;padding:8px 0;min-height:44px;text-decoration:underline}
+.gps{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.btn{min-height:46px;padding:10px 20px;border-radius:10px;border:1.5px solid var(--g);background:var(--panel);color:var(--g);font-weight:600;cursor:pointer}
+.btn.pri{background:var(--g);color:var(--panel)}
+.docs{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,220px),1fr));gap:14px;margin-top:22px}
+.doc{border:1.5px solid var(--line);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:6px}
+.doc.okd{border-color:var(--g)}.doc.bd{border-color:var(--red)}
+.doc label.btn{text-align:center;display:block}
+.doc input{position:absolute;opacity:0;width:1px;height:1px}
+.cons{display:grid;gap:12px;margin-top:20px}
+.con{border:1px solid var(--line);border-radius:12px;padding:14px 16px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px 16px;align-items:center}
+.con p{margin:0}
+.stamp{grid-column:1/-1;font-size:13px;color:var(--mute)}
+.sigs{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:18px;margin-top:18px}
+canvas{width:100%;height:160px;border:1.5px dashed var(--line);border-radius:10px;background:var(--panel);touch-action:none;display:block}
+.rev{display:grid;gap:10px;margin-top:20px}
+.row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center;border:1px solid var(--line);border-radius:12px;padding:12px 16px}
+.row b{display:block}
+.row span{color:var(--mute);font-size:15px;overflow-wrap:anywhere}
+.side{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:14px;margin-top:18px}
+.box{border-radius:12px;padding:14px 16px;background:var(--bg);border:1px solid var(--line)}
+.box.fl{background:var(--ambs);border-color:color-mix(in srgb,var(--amb) 40%,transparent)}
+.box ul{margin:6px 0 0;padding-left:18px}
+.foot{position:fixed;bottom:0;left:0;right:0;background:var(--panel);border-top:1px solid var(--line);z-index:5}
+.foot div{max-width:1240px;margin:0 auto;display:flex;gap:12px;align-items:center;padding:12px max(3vw,16px);flex-wrap:wrap}
+.foot .saved{font-size:14px;color:var(--mute);flex:1}
+.big{font-size:clamp(30px,6vw,46px);font-weight:700;letter-spacing:.02em;color:var(--g)}
+.sample{font-size:13px;color:var(--mute);margin-top:14px}
+@media(max-width:600px){.top{gap:4px 12px;padding:6px 16px}.long{display:none}.pill{display:none}.top .sp{display:none}}
+@media(max-width:760px){.wrap{grid-template-columns:minmax(0,1fr)}.rail{position:static;padding:10px 8px 0;overflow-x:auto}.rail ol{display:flex;gap:4px}.rail button{white-space:nowrap;padding:8px 10px}.rail .lbl{display:none}.rail button[aria-current=step] .lbl{display:inline}.who{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:no-preference){.card{animation:in .25s ease-out}@keyframes in{from{opacity:0;transform:translateY(6px)}}}
+</style>
+</head>
+<body>
+<header class="top">
+<div class="logo"><b>A</b>AfrikCap</div>
+<span class="pill" id="stepPill">Step 1 of 8</span>
+<div class="sp"></div>
+<label class="sw"><input type="checkbox" id="behalf" checked><span>Filling on behalf<span class="long"> of borrower</span></span></label>
+<label class="sw"><input type="checkbox" id="shownotes" checked><span><span class="long">Show </span>fix notes</span></label>
+<button class="link" id="reset">Reset demo</button>
+</header>
+<div class="wrap">
+<nav class="rail" aria-label="Application steps"><ol id="rail"></ol></nav>
+<main><div class="card" id="card"></div>
+<p class="sample">Prototype with sample data: product limits come from the current build; the district list is a sample, and the duplicate-NIN register and location pin are simulated.</p></main>
+</div>
+<footer class="foot"><div><span class="saved" id="saved">Not saved yet</span><button class="btn" id="back">Back</button><button class="btn pri" id="next">Save and continue</button></div></footer>
+<script>
+{
+const IND=[['sa','Salary Advance','Salaried employees verified through HR',1e5,2e6,1,30,'days'],['tu','Top-Up / Refinance','Existing borrowers with 3+ on-time repayments; up to 50% of original principal',0,0,0,0,'months'],['pl','Salary / Personal Loan','Salaried employees',5e5,3e7,6,36,'months'],['ed','Education Loan','Parents or self-funding students',3e5,15e6,3,24,'months'],['me','Medical Emergency Loan','Any verified applicant with income or guarantor',2e5,1e7,3,18,'months'],['af','Asset Finance','Retailers, salaried, small businesses',5e5,5e7,6,48,'months'],['hi','Home Improvement Loan','Property owners with proof of ownership',5e5,25e6,6,36,'months'],['bb','Bodaboda Loan','Licensed bodaboda riders',2e6,1e7,12,36,'months']];
+const BIZ=[['rw','Retailer Working Capital','Retailers, dukas, agri-input dealers, smallholder farmers',5e5,2e7,1,12,'months'],['ds','Distributor / Supplier Loan','Distributors and wholesalers (URSB + TIN registered)',5e6,2e8,1,6,'months'],['vs','Group / VSLA Loan','Registered VSLAs and community groups, 6+ months active',2e5,8e6,3,18,'months']];
+const DISTRICTS=['Arua','Bushenyi','Busia','Buikwe','Gulu','Hoima','Iganga','Jinja','Kabale','Kabarole','Kampala','Kamuli','Kasese','Kayunga','Kitgum','Lira','Luwero','Masaka','Masindi','Mbale','Mbarara','Mityana','Moroto','Mpigi','Mubende','Mukono','Ntungamo','Rukungiri','Soroti','Tororo','Wakiso'];
+const REGISTER=['CF88K4J2N7P1QX'];
+const LOANTYPES=['Bank loan','Microfinance (MFI)','SACCO','Mobile money loan','Digital lender app','Informal / moneylender','Other'];
+const STEPS=[['Loan product and amount','Bwewola ki?'],['Applicant identity','Ebikwata ku Mugeenyi'],['Address and location','Disitulikiti gy’obeera'],['Next of kin and finances',''],['Product details',''],['Documents','Ebiwandiiko'],['Consents and signatures',''],['Check before sending','Kebera nga tonnaweereza']];
+const NOTES=[['Nothing is pre-selected: products appear only after Individual or Business is chosen.','Amount, tenor and currency are asked here, checked against the product’s limits.','No draft is created until a product is picked.'],['Date of birth takes a 4-digit year and shows the age as you type.','The NIN is checked and decoded live: status, sex and birth year.','Gender fills from the NIN; mismatches are flagged for the reviewer, not blocked.','Marital status is a dropdown. Spouse fields open on this page, so the step count never changes.','Errors show once a field is left, not before it is touched.'],['District is a dropdown, not free text.','Sub-county, village, landmark and years at address move to KYC 2 at contract signing.','The location pin shows only when an agent fills for a borrower, and is flagged if outside Uganda.'],['Next of kin relationship is a dropdown; “Specify other” is optional and opens below it without moving other fields.','Next of kin name, phone and NIN move to KYC 2 at contract signing.','Active loans use generic loan types and allow more than one.','Income moved here from product specifics.'],['Fields lenders rely on are required; the property address can reuse the home address.'],['Black or blank photos are rejected on the device.','The bank statement slot accepts PDF only.','Spouse consent appears only for married applicants.'],['Both signatures sit on one page.','Each consent is stamped with who recorded it.','New: separate NIN-verification consent for the NIRA check (Luganda text to come).'],['Rows are named by their content and every flag for the reviewer is listed in one place.','“Filled by” follows the on-behalf switch.','Submission shows a short reference, not a system ID.']];
+const CONSENTS=[['I consent to AfrikCap processing my personal data in line with the Uganda Data Protection and Privacy Act, 2019.',1],['I consent to a credit reference (CRB) and bureau check by AfrikCap’s registered partners.',1],['I consent to AfrikCap sharing my application data with registered partners for loan evaluation.',1],['I confirm the terms, conditions, interest rate and repayment obligations of this loan were explained to me.',1],['I consent to my personal data being stored and processed outside Uganda, as described in the Privacy Policy.',1],['I would like to receive marketing messages and product updates from AfrikCap.',0],['I consent to AfrikCap checking my National Identification Number (NIN) with the National Identification and Registration Authority (NIRA) to confirm my identity for this loan application. NIRA will only confirm whether my NIN matches its records. The result is used only for identity verification, fraud prevention and credit assessment, and is not shared with lenders.',1]];
+const blank=()=>({step:0,max:0,behalf:true,notes:true,who:'',product:'',amount:'',tenor:'',currency:'UGX',name:'',nin:'',dob:'',gender:'',genderFromNin:false,nationality:'',phone:'',marital:'',spName:'',spNin:'',spPhone:'',spConsent:'',dependants:'',district:'',subcounty:'',village:'',landmark:'',years:'',residence:'',gps:null,kinRel:'',kinOther:'',incomeSrc:'',income:'',employer:'',active:'',loans:[],propType:'',afCat:'',afCond:'',afDesc:'',vType:'',vMake:'',vModel:'',vYear:'',afUse:'',afValue:'',afDown:'',sName:'',sReg:'',sContact:'',sPhone:'',sameAddr:true,propAddr:'',ownership:'',titleName:'',works:[],cost:'',own:'',contractor:'',disb:'',purpose:'',docs:{},cons:{},sigA:false,sigB:false,touched:{},tried:{},savedAt:'',ref:''});
+let S=blank(),sig={};
+const $=s=>document.querySelector(s),esc=v=>String(v??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const fmt=n=>Number(n||0).toLocaleString('en-US');
+const prod=()=>[...IND,...BIZ].find(p=>p[0]===S.product);
+const now=()=>new Date().toTimeString().slice(0,5);
+function save(){S.savedAt=now();try{localStorage.setItem('afk-proto',JSON.stringify(S))}catch(e){}$('#saved').textContent='Saved on this device · '+S.savedAt}
+function age(d){const m=/^(\d{2})\/(\d{2})\/(\d{4})$/.exec(d);if(!m)return null;const dt=new Date(+m[3],m[2]-1,+m[1]);if(dt.getDate()!=+m[1]||dt.getMonth()!=m[2]-1)return NaN;const t=new Date();let a=t.getFullYear()-dt.getFullYear();if(t<new Date(t.getFullYear(),dt.getMonth(),dt.getDate()))a--;return a}
+function ninInfo(n){const st={C:'Citizen',P:'Permanent resident',R:'Refugee',A:'Alien / non-citizen'};const r={ok:/^[CPRA][MF]\d{2}[A-Z0-9]{10}$/.test(n),parts:[]};if(n.length>=1&&st[n[0]])r.parts.push(st[n[0]]);if(n.length>=2&&/[MF]/.test(n[1]))r.parts.push(n[1]==='M'?'Male':'Female');if(n.length>=4&&/^\d\d$/.test(n.slice(2,4)))r.parts.push('Born ’'+n.slice(2,4));return r}
+function ninWarns(n,g,dob,nat,who){const w=[];if(!/^[CPRA][MF]\d{2}[A-Z0-9]{10}$/.test(n))return w;const sx=n[1]==='M'?'Male':'Female';if(g&&g!==sx)w.push(who+' NIN says '+sx+', form says '+g);const m=/\d{4}$/.exec(dob);if(m&&m[0].slice(2)!==n.slice(2,4))w.push(who+' NIN birth year ’'+n.slice(2,4)+' does not match date of birth ('+m[0]+')');const exp={C:['Ugandan'],R:['Refugee'],P:['EAC','Other'],A:['EAC','Other']}[n[0]];if(nat&&exp&&!exp.includes(nat))w.push(who+' NIN status does not match nationality ('+nat+')');if(REGISTER.includes(n))w.push(who+' NIN already appears on another open application');return w}
+const phoneErr=v=>!v?'Required':/^7\d{8}$/.test(v)?'':'Enter 9 digits starting with 7, without +256 or 0';
+function check(i){const e={},w=[],p=prod();const req=(k,lab)=>{if(!String(S[k]??'').trim())e[k]=lab||'Required'};
+ if(i===0){if(!S.who)e.who='Choose who the loan is for';else if(!S.product)e.product='Choose a product';else{req('amount');req('tenor');const a=+S.amount,t=+S.tenor;if(S.amount&&p[3]&&S.currency==='UGX'&&(a<p[3]||a>p[4]))e.amount='This product lends UGX '+fmt(p[3])+' to '+fmt(p[4]);if(S.tenor&&p[5]&&(t<p[5]||t>p[6]))e.tenor='Between '+p[5]+' and '+p[6]+' '+p[7]}}
+ if(i===1){req('name');if(S.name&&!/^[A-Za-z'\-]{2,}( [A-Za-z'\-]{2,})+$/.test(S.name.trim()))e.name='Enter first and last name as on the ID, letters only';req('nin');if(S.nin&&!/^[CPRA][MF]\d{2}[A-Z0-9]{10}$/.test(S.nin))e.nin='14 characters: status and sex (e.g. CM, CF), 2-digit birth year, then 10 letters or digits';req('dob');const a=age(S.dob);if(S.dob&&a===null)e.dob='Use dd/mm/yyyy with a 4-digit year';else if(S.dob&&isNaN(a))e.dob='That date does not exist';else if(a!==null&&(a<18||a>70))e.dob='Applicant is '+a+'; must be 18 to 70';req('gender');req('nationality');const pe=phoneErr(S.phone);if(pe)e.phone=pe;req('marital');
+  if(S.marital==='Married'){req('spName');req('spNin');if(S.spNin&&!/^[CPRA][MF]\d{2}[A-Z0-9]{10}$/.test(S.spNin))e.spNin='Not a valid NIN format';else if(S.spNin&&S.spNin===S.nin)e.spNin='Spouse NIN cannot match the applicant’s';const sp=phoneErr(S.spPhone);if(sp)e.spPhone=sp;else if(S.spPhone===S.phone)e.spPhone='Use the spouse’s own number';req('spConsent');w.push(...ninWarns(S.spNin,'',S.marital?'':'','','Spouse'))}
+  w.push(...ninWarns(S.nin,S.gender,S.dob,S.nationality,'Applicant'))}
+ if(i===2){req('district');req('residence');if(S.behalf&&!S.gps)e.gps='Pin the location before continuing';else if(S.behalf&&S.gps&&S.gps.out)w.push('Location pin is outside Uganda ('+S.gps.lat+', '+S.gps.lon+')')}
+ if(i===3){req('incomeSrc');req('income');req('active');if(S.active==='Yes'){if(!S.loans.length)e.active='Add at least one active loan';S.loans.forEach((l,j)=>{if(!l.type||!l.lender||!l.balance||!l.monthly||!l.months)e['loan'+j]='Complete every field for this loan'})}}
+ if(i===4){if(S.product==='af'){req('afCat');if(S.afCat)req('afCond');if(S.afCat&&S.afCond){if(S.afCat==='Vehicle'){req('vType');req('vMake');req('vModel');req('vYear')}else req('afDesc');if(S.afCat==='Vehicle'&&S.afCond==='New')req('afUse');req('afValue');const v=+S.afValue,dn=+S.afDown||0;if(v&&dn>v)e.afDown='Down payment cannot exceed the asset value';else if(v&&S.amount&&+S.amount>v-dn)w.push('Loan of UGX '+fmt(S.amount)+' is more than asset value minus down payment (UGX '+fmt(v-dn)+')');if(v&&S.afDown&&dn/v<.2)w.push('Down payment is '+Math.round(dn/v*100)+'% of asset value, below the recommended 20%')}if(S.afCat==='Vehicle'&&S.afCond==='New'){req('sName');const sp=phoneErr(S.sPhone);if(sp)e.sPhone=sp}}else if(S.product==='hi'){req('propType');req('ownership');if(S.ownership==='Owned with title')req('titleName');if(!S.works.length)e.works='Pick at least one';req('cost');if(!S.sameAddr)req('propAddr');req('disb')}else req('purpose')}
+ if(i===5){docList().forEach(d=>{const v=S.docs[d.k];if(d.req&&(!v||v.bad))e['doc_'+d.k]=v&&v.bad?v.bad:'Required';if(!d.req&&v&&v.bad)e['doc_'+d.k]=v.bad})}
+ if(i===6){CONSENTS.forEach((c,j)=>{if(!S.cons[j])e['c'+j]='Answer Yes or No';else if(c[1]&&S.cons[j].v==='No')e['c'+j]=j===6?'Without this one, the application cannot be verified or sent to a bank':'Without this, the application cannot go to a lender'});if(!S.sigA)e.sigA='Applicant signature required';if(!S.sigB)e.sigB='Agent signature required'}
+ return {e,w}}
+function docList(){const d=[{k:'idf',n:'National ID, front',req:1,t:'img'},{k:'idb',n:'National ID, back',req:1,t:'img'},{k:'self',n:'Selfie holding the ID',req:1,t:'img'},{k:'bank',n:'Bank statement, last 6 months',req:1,t:'pdf'}];if(S.product==='hi')d.push({k:'boq',n:'Bill of quantities or quote',req:0,t:'any'},{k:'cq',n:'Contractor quote',req:0,t:'any'});if(S.marital==='Married')d.push({k:'spc',n:'Spouse consent letter',req:0,t:'any'});d.push({k:'sup',n:'Other supporting document',req:0,t:'any'});return d}
+const show=(k,i)=>S.touched[k]||S.tried[i];
+function F(k,label,lug,ctl,o={}){return `<div class="f ${o.full?'full':''}" id="f-${k}"><label for="i-${k}">${label} <span class="req">· ${o.opt?'optional, skip it':'required'}</span></label><div class="lg">${lug||'&nbsp;'}</div>${ctl}<div class="hint" id="h-${k}">${o.hint||''}</div><div class="err" id="e-${k}"></div></div>`}
+const T=(k,o={})=>`<input class="in" id="i-${k}" data-k="${k}" value="${esc(S[k])}" ${o.num?'inputmode="numeric"':''} ${o.ph?`placeholder="${o.ph}"`:''} autocomplete="off">`;
+const PH=k=>`<div class="pre"><span>+256</span>${T(k,{num:1,ph:'7XXXXXXXX'})}</div>`;
+const SEL=(k,opts,ph='Choose…')=>`<select id="i-${k}" data-k="${k}"><option value="">${ph}</option>${opts.map(o=>`<option ${S[k]===o?'selected':''}>${esc(o)}</option>`).join('')}</select>`;
+const CH=(k,opts,multi)=>`<div class="chips" id="i-${k}">${opts.map(o=>`<button type="button" class="chip" data-chip="${k}" data-v="${esc(o)}" data-multi="${multi?1:''}" aria-pressed="${multi?S[k].includes(o):S[k]===o}">${esc(o)}</button>`).join('')}</div>`;
+const MONEY=k=>`<div class="pre"><span>${k==='amount'?esc(S.currency):'UGX'}</span>${T(k,{num:1})}</div>`;
+function views(i){const p=prod();
+ if(i===0){let h=`<div class="f" style="margin-top:24px"><label>Who is the loan for? <span class="req">· required</span></label><div class="lg">Bwewola gwa ani?</div><div class="who">${[['Individual','An individual','Omuntu ssekinnoomu'],['Business','A business','Bizinensi']].map(w=>`<button type="button" class="chip" data-who="${w[0]}" aria-pressed="${S.who===w[0]}">${w[1]}<small>${w[2]}</small></button>`).join('')}</div><div class="err" id="e-who"></div></div>`;
+  if(S.who){const L=S.who==='Individual'?IND:BIZ;h+=`<h2 class="sec">Choose a product</h2><div class="prods" style="margin-top:12px">${L.map(q=>`<button type="button" class="prod" data-prod="${q[0]}" aria-pressed="${S.product===q[0]}"><b>${q[1]}</b>${q[0]==='sa'?'<span class="tag">You use most</span>':''}<small>${q[2]}${q[3]?` · UGX ${fmt(q[3]/1e6>=1?q[3]/1e6:q[3]/1e3)}${q[3]>=1e6?'M':'K'}–${fmt(q[4]/1e6)}M · ${q[5]}–${q[6]} ${q[7]}`:''}</small></button>`).join('')}</div><div class="err" id="e-product"></div>`}
+  if(p)h+=`<h2 class="sec">How much, and for how long?</h2><div class="grid">${F('currency','Currency','',CH('currency',['UGX','USD']),{hint:'Most loans are in Uganda Shillings.'})}${F('amount','Loan amount',"Ensimbi z’omusolo z’osaba",MONEY('amount'),{hint:p[3]?`Limits: UGX ${fmt(p[3])} to ${fmt(p[4])}`:'Up to 50% of the original principal'})}${F('tenor','Repayment period ('+p[7]+')','',T('tenor',{num:1}),{hint:p[5]?`${p[5]} to ${p[6]} ${p[7]}`:''})}</div>`;return h}
+ if(i===1){const inf=ninInfo(S.nin);return `<div class="grid">${F('name','Full legal name (as on National ID)',"Erinnya lyonna ddalu (nga bwe liri ku ID y’Eggwanga)",T('name',{ph:'e.g. Sarah Namubiru'}),{full:1})}
+ ${F('nin','National ID Number (NIN)',"Ennamba ya ID y’Eggwanga (NIN)",T('nin',{ph:'CF99A1B2C3D4EF'})+`<div class="nbox" id="nbox"></div><div class="decode" id="decode"></div>`)}
+ ${F('dob','Date of birth',"Olunaku lw’okuzaalibwa",T('dob',{num:1,ph:'dd/mm/yyyy'}))}
+ ${F('gender','Gender','Ekikula',CH('gender',['Male','Female']),{hint:S.genderFromNin?'Filled from the NIN':''})}
+ ${F('nationality','Nationality','Obuzaaliranwa',SEL('nationality',['Ugandan','EAC','Refugee','Other']))}
+ ${F('phone','Applicant phone','',PH('phone'))}
+ ${F('marital','Marital status',"Embeera y’obufumbo",SEL('marital',['Single','Married','Divorced','Widowed']))}
+ ${F('dependants','Number of dependants',"Omuwendo gw’abeesigamako",T('dependants',{num:1}),{opt:1})}</div>
+ ${S.marital==='Married'?`<div class="inline"><h2 class="sec" style="border:0;margin-top:22px;padding-top:0">Spouse</h2><div class="grid" style="margin-top:12px">${F('spName','Spouse full name','Erinnya lyonna ddalu lya mukyala/omwami',T('spName'))}${F('spNin','Spouse NIN','NIN ya mukyala/omwami',T('spNin'))}${F('spPhone','Spouse phone','Essimu ya mukyala/omwami',PH('spPhone'))}${F('spConsent','Spouse consents to this application?','Mukyala/omwami akkiriza okusaba kuno?',CH('spConsent',['Yes','No']))}</div></div>`:''}`}
+ if(i===2)return `<div class="grid">${F('district','District of residence',"Disitulikiti gy\u2019obeera",SEL('district',DISTRICTS,'Choose a district\u2026'))}${F('residence','Residence ownership',"Obwannannyini bw’awaka",CH('residence',['Owned','Rented','Family','Employer']))}
+ ${S.behalf?F('gps','Pin where you are standing','',`<div class="gps"><button type="button" class="btn" id="pin">${S.gps?'Pin again':'Pin location'}</button><span id="gpsv">${S.gps?`${S.gps.lat}, ${S.gps.lon} · ±${S.gps.acc} m ${S.gps.out?'<span class="warn">outside Uganda</span>':'<span class="ok">inside Uganda</span>'}`:'Not pinned'}</span></div><button type="button" class="link" id="pinout">Demo: pin a location outside Uganda</button>`,{full:1,hint:'Agent login only: confirms the agent met the borrower. Location is simulated in this prototype.'}):''}</div>`;
+ if(i===3)return `<div class="grid">${F('kinRel','Next of kin relationship','Enkolagana ne munno gw\u2019okubeerako',SEL('kinRel',['Spouse','Parent','Child','Sibling','Other']),{opt:1,hint:'Name, phone and NIN of next of kin are taken at contract signing (KYC 2).'})}${S.kinRel==='Other'?F('kinOther','Specify other relationship','Laga enkolagana endala',T('kinOther'),{opt:1}):''}</div>
+ <h2 class="sec">Income</h2><div class="grid">${F('incomeSrc','Main income source','Ensibuko ya nsimbi z’oyo asaba',CH('incomeSrc',['Salary','Business','Farming','Rental','Mixed']))}${F('income','Monthly income after tax','',MONEY('income'),{hint:p&&S.amount&&S.tenor?`Principal per ${p[7]==='days'?'loan':'month'}, before interest: UGX ${fmt(p[7]==='days'?+S.amount:Math.round(S.amount/S.tenor))}`:''})}${S.incomeSrc==='Salary'?F('employer','Employer','',T('employer'),{opt:1}):''}</div>
+ <h2 class="sec">Active loans</h2><div class="grid">${F('active','Does the applicant have any active loans?','Olina looni ezikola kati?',CH('active',['Yes','No']),{full:1})}</div>
+ ${S.active==='Yes'?S.loans.map((l,j)=>`<div class="loan"><div class="grid" style="margin-top:0">${[['type','Loan type'],['lender','Lender / institution'],['balance','Outstanding balance (UGX)'],['monthly','Monthly repayment (UGX)'],['months','Months remaining']].map(([k,lb])=>`<div class="f"><label for="l${j}${k}">${lb}</label>${k==='type'?`<select id="l${j}${k}" data-loan="${j}" data-lk="${k}"><option value="">Choose…</option>${LOANTYPES.map(t=>`<option ${l.type===t?'selected':''}>${t}</option>`).join('')}</select>`:`<input class="in" id="l${j}${k}" data-loan="${j}" data-lk="${k}" value="${esc(l[k])}" ${k==='lender'?'':'inputmode="numeric"'}>`}</div>`).join('')}</div><div class="err" id="e-loan${j}"></div><button type="button" class="link" data-rmloan="${j}">Remove this loan</button></div>`).join('')+`<button type="button" class="btn" id="addloan" style="margin-top:12px">Add ${S.loans.length?'another':'an'} active loan</button>`:''}`;
+ if(i===4){if(S.product==='af'){const veh=S.afCat==='Vehicle'&&S.afCond==='New';return `<div class="grid">${F('afCat','Asset category',"Ekika ky\u2019ebyobugagga",SEL('afCat',['Vehicle','Motorcycle','Generator','Fridge','Solar','Sewing machine','Equipment','Furniture','Electronics','Other'],'Choose a category\u2026'))}${S.afCat?F('afCond','New or used','Kipya oba kikozesebwa',CH('afCond',['New','Used'])):''}${S.afCat==='Vehicle'&&S.afCond?F('vType','Vehicle type','',SEL('vType',['Car / saloon','Station wagon','SUV','Pickup','Van / minibus','Truck']))+F('vMake','Make','',SEL('vMake',['Toyota','Nissan','Mitsubishi','Isuzu','Subaru','Mazda','Honda','Suzuki','Mercedes-Benz','Volkswagen','Other']))+F('vModel',S.vMake==='Other'?'Make and model':'Model','',T('vModel',{ph:S.vMake==='Toyota'?'e.g. Probox':'e.g. model name'}))+F('vYear','Year of manufacture','',SEL('vYear',Array.from({length:27},(_,j)=>String(new Date().getFullYear()-j)))):''}${S.afCat&&S.afCat!=='Vehicle'&&S.afCond?F('afDesc','Asset description (make / model)',"Ennyinyonnyola y\u2019ekyobugagga",T('afDesc',{ph:S.afCat==='Vehicle'?'e.g. Toyota Probox 2016':'e.g. 5 kVA petrol generator'}),{full:1}):''}</div>${S.afCat&&S.afCond?`<div class="grid">${veh?F('afUse','Asset use',"Enkozesa y\u2019ekintu",CH('afUse',['Personal','Business','Both'])):''}${F('afValue','Asset value',"Omuwendo gw\u2019ekintu",MONEY('afValue'))}${F('afDown','Down payment available',"Ensimbi ez\u2019awali ezisoboka",MONEY('afDown'),{opt:1,hint:'Recommended: at least 20% of asset value'})}</div>`:''}${veh?`<h2 class="sec">Seller (new vehicles only)</h2><div class="grid">${F('sName','Seller / dealer name',"Erinnya ly\u2019omutunzi / omusuubuzi",T('sName'))}${F('sReg','Seller is a registered business?','Omutunzi bizinensi ewandiise?',CH('sReg',['Yes','No']),{opt:1})}${F('sContact','Seller contact name',"Erinnya ly\u2019omuguzi",T('sContact'),{opt:1})}${F('sPhone','Seller phone',"Essimu y\u2019omuguzi",PH('sPhone'),{hint:'Seller address and bank details are taken at contract signing (KYC 2).'})}</div>`:''}`}if(S.product!=='hi')return `<p class="sub" style="margin-top:18px">This prototype details Home Improvement. ${esc(p?p[1]:'This product')} keeps its own questions; one is shown here.</p><div class="grid">${F('purpose','What will the loan be used for?','',`<textarea id="i-purpose" data-k="purpose">${esc(S.purpose)}</textarea>`,{full:1})}</div>`;
+  return `<div class="grid">${F('propType','Type of property',"Ekika ky’ebintu",CH('propType',['Residential house','Family land','Rental property','Mixed-use shop + home']),{full:1})}${F('ownership','Ownership status','Embeera ya nannyini properti',CH('ownership',['Owned with title','Owned, LC1 letter only','Family land','Other']),{full:1})}${S.ownership==='Owned with title'?F('titleName','Title in whose name?','Kyapa kiri mu linnya lya ani?',T('titleName')):''}
+  <div class="f full"><label class="sw" style="min-height:0"><input type="checkbox" id="same" ${S.sameAddr?'checked':''}> Property is at the applicant’s home address${S.district?' ('+esc(S.district)+' district)':''}</label></div>${S.sameAddr?'':F('propAddr','Property full address','Endagiriro enzijuvu eya properti',`<textarea id="i-propAddr" data-k="propAddr">${esc(S.propAddr)}</textarea>`,{full:1})}
+  ${F('works','Type of improvement','Engeri ya kulongoosa',CH('works',['Roofing','Plastering','Fencing','Water tank','Latrine','Extension','Plumbing','Electrical','Other'],1),{full:1,hint:'Select all that apply'})}${F('cost','Estimated cost of works',"Omuwendo oguteeberezebwa",MONEY('cost'))}${F('own','Own contribution','Omugabo gwo',MONEY('own'),{opt:1})}${F('contractor','Contractor / fundi name','Erinnya lya konturakita / omupima',T('contractor'),{opt:1})}${F('disb','Disbursement preference','',CH('disb',['Single tranche','Two tranches','Direct to contractor']),{full:1})}</div>`}
+ if(i===5)return `<div class="docs">${docList().map(d=>{const v=S.docs[d.k];return `<div class="doc ${v?(v.bad?'bd':'okd'):''}" id="f-doc_${d.k}"><b>${d.n}</b><span class="req">${d.req?'required':'optional'} · ${d.t==='pdf'?'PDF only':d.t==='img'?'photo':'photo or PDF'}</span>${v?`<span class="${v.bad?'err':'ok'}">${v.bad?esc(v.bad):'✓ '+esc(v.name)+' · '+v.kb+' KB'}</span>`:v===undefined&&S.docs[d.k+'_f']?'<span class="warn">Marked to follow</span>':''}<label class="btn" for="u-${d.k}">${v?'Replace':'Add file'}</label><input type="file" id="u-${d.k}" data-doc="${d.k}" data-t="${d.t}" accept="${d.t==='pdf'?'application/pdf,.pdf':d.t==='img'?'image/*':'image/*,application/pdf'}">${!d.req&&!v?`<button type="button" class="link" data-follow="${d.k}">${S.docs[d.k+'_f']?'Undo to follow':'Mark as to follow'}</button>`:''}<div class="err" id="e-doc_${d.k}"></div></div>`}).join('')}</div><p class="hint">Photos are checked on this device: a dark or blank photo is rejected before upload.</p>`;
+ if(i===6)return `<div class="notes" style="background:var(--bg)"><b>Read this to the borrower.</b> Read each one aloud and record only what is agreed. Nothing is pre-ticked.</div><div class="cons">${CONSENTS.map((c,j)=>{const a=S.cons[j];return `<div class="con" id="f-c${j}"><p>${c[0]}${c[1]?'':' <span class="req">(optional)</span>'}</p><div class="chips">${['Yes','No'].map(v=>`<button type="button" class="chip" data-con="${j}" data-v="${v}" aria-pressed="${a&&a.v===v}">${v}</button>`).join('')}</div>${a?`<div class="stamp">Recorded ${a.t} · ${a.by}</div>`:''}<div class="err" id="e-c${j}" style="grid-column:1/-1"></div></div>`}).join('')}</div>
+ <h2 class="sec">Signatures</h2><div class="sigs">${[['sigA','Applicant signature','Ask the applicant to sign, confirming the information is accurate.'],['sigB','Agent witness signature','I (the agent) read every consent above and witnessed the signature.']].map(([k,t,d])=>`<div class="f" id="f-${k}"><label>${t}</label><div class="lg">${d}</div><canvas id="cv-${k}" data-sig="${k}" aria-label="${t} pad"></canvas><button type="button" class="link" data-clear="${k}">Clear</button><div class="err" id="e-${k}"></div></div>`).join('')}</div>`;
+ if(i===7){const all=[0,1,2,3,4,5,6].map(check),flags=all.flatMap(c=>c.w),miss=all.map((c,j)=>Object.keys(c.e).length?j:-1).filter(j=>j>=0);const docsN=docList().filter(d=>S.docs[d.k]&&!S.docs[d.k].bad).length;
+  const rows=[[0,'Loan',p?`${p[1]} · ${S.currency} ${fmt(S.amount)} · ${S.tenor} ${p[7]}`:'Not chosen'],[1,'Applicant',`${S.name||'—'} · ${S.nin||'no NIN'} · ${S.dob||'no birth date'}${age(S.dob)>0?' (age '+age(S.dob)+')':''} · ${S.gender||'—'} · ${S.marital||'—'}`],...(S.marital==='Married'?[[1,'Spouse',`${S.spName||'—'} · ${S.spNin||'no NIN'} · consent ${S.spConsent||'—'}`]]:[]),[2,'Address and location',`${S.district||'—'}${S.behalf?' · '+(S.gps?S.gps.lat+', '+S.gps.lon:'not pinned'):''}`],[3,'Next of kin relationship',`${S.kinRel==='Other'&&S.kinOther?S.kinOther:(S.kinRel||'—')} · details at contract signing`],[3,'Income and active loans',`${S.incomeSrc||'—'} · UGX ${fmt(S.income)}/month · ${S.active==='Yes'?S.loans.length+' active loan(s)':S.active==='No'?'no active loans':'—'}`],[4,'Product details',S.product==='af'?`${S.afCat||'\u2014'} \u00b7 ${S.afCond||'\u2014'} \u00b7 ${S.afCat==='Vehicle'?([S.vYear,S.vMake==='Other'?'':S.vMake,S.vModel,S.vType?'('+S.vType+')':''].filter(Boolean).join(' ')||'\u2014'):(S.afDesc||'\u2014')} \u00b7 value UGX ${fmt(S.afValue)}, down UGX ${fmt(S.afDown)}${S.sName?' \u00b7 seller '+S.sName:''}`:S.product==='hi'?`${S.propType||'—'} · ${S.works.join(', ')||'no works chosen'} · UGX ${fmt(S.cost)}`:(S.purpose||'—')],[5,'Documents',`${docsN} of ${docList().length} attached`],[6,'Consents and signatures',`${Object.keys(S.cons).length} of ${CONSENTS.length} answered · ${S.sigA&&S.sigB?'both signed':'signatures missing'}`]];
+  return `<div class="side"><div class="box"><b>Filled by</b><br>${S.behalf?'Agent test.derwal, on behalf of the borrower':'The borrower, on this device'}<div class="hint">Recorded on the application and carried through to allocation.</div></div><div class="box ${flags.length?'fl':''}"><b>${flags.length?flags.length+' flag'+(flags.length>1?'s':'')+' for the reviewer':'No flags for the reviewer'}</b>${flags.length?`<ul>${flags.map(f=>`<li>${esc(f)}</li>`).join('')}</ul>`:'<div class="hint">NIN, location and documents passed every check.</div>'}</div></div>
+  <div class="rev">${rows.map(r=>`<div class="row"><div><b>${r[1]}</b><span>${esc(r[2])}</span>${miss.includes(r[0])?'<div class="err">Incomplete</div>':''}</div><button type="button" class="link" data-go="${r[0]}">Edit</button></div>`).join('')}</div>`}}
+function render(){const i=S.step;$('#stepPill').textContent=S.ref?'Submitted':`Step ${i+1} of 8`;$('#behalf').checked=S.behalf;$('#shownotes').checked=S.notes;
+ $('#rail').innerHTML=STEPS.map((s,j)=>{const c=check(j),done=j<S.max&&!Object.keys(c.e).length;return `<li class="${done?(c.w.length?'flag':'done'):''}"><button type="button" data-go="${j}" ${j===i&&!S.ref?'aria-current="step"':''}><span class="dot">${done?(c.w.length?'!':'✓'):j+1}</span><span class="lbl">${s[0]}</span></button></li>`}).join('');
+ if(S.ref){$('#card').innerHTML=`<h1>Application submitted</h1><p class="sub">Okusaba kutumiddwa</p><p style="margin-top:20px">Application reference</p><div class="big" id="refv">${S.ref}</div><button class="btn" id="copy" style="margin-top:10px">Copy reference</button><p class="hint" id="copied"></p><div class="side"><div class="box"><b>What happens next</b><ul><li>Review: a reviewer checks the file and documents.</li><li>Allocation: only then does a partner bank see it.</li><li>Decision: the outcome comes back through the agent.</li></ul></div><div class="box"><b>Draft</b><br>${esc(S.name)} · ${esc(prod()?.[1]||'')}<div class="hint">Drafts are named by applicant and product.</div></div></div><button class="btn pri" id="again" style="margin-top:22px">Start another application</button>`;$('.foot').hidden=true;return}
+ $('.foot').hidden=false;
+ $('#card').innerHTML=`<h1>${STEPS[i][0]}</h1><p class="sub">${STEPS[i][1]||'&nbsp;'}</p>${S.notes?`<div class="notes"><b>Fixed on this screen</b><ul>${(i===4&&S.product==='af'?['Asset category is a dropdown, not an open list.','Questions follow in order: category, then new or used, then description. For vehicles, type, make and year are dropdowns.','Asset use and seller details are asked only for a new vehicle; seller address and bank details wait for KYC 2.','Asset value is required, and the loan is checked against value minus down payment.']:NOTES[i]).map(n=>`<li>${n}</li>`).join('')}</ul></div>`:''}${views(i)}`;
+ $('#back').disabled=i===0;$('#next').textContent=i===7?'Send application':'Save and continue';
+ if(i===6)initSigs();live()}
+function live(){const i=S.step,c=check(i);document.querySelectorAll('.err[id^="e-"]').forEach(el=>{const k=el.id.slice(2);const m=c.e[k];el.textContent=m&&show(k,i)?m:'';const f=document.getElementById('f-'+k);if(f)f.classList.toggle('bad',!!(m&&show(k,i)))});
+ if(i===1){const n=S.nin,inf=ninInfo(n);const cls=j=>j<2?'g1':j<4?'g2':j<12?'g3':'g4';$('#nbox').innerHTML=Array.from({length:14},(_,j)=>`<i class="${n[j]?cls(j):''}">${esc(n[j]||'')}</i>`).join('');$('#decode').innerHTML=inf.parts.map(p=>`<span>${p}</span>`).join('')+(inf.ok?'<span class="ok">Format OK</span>':'');
+  const a=age(S.dob);$('#h-dob').innerHTML=a>0?`<span class="ok">Age: ${a} years</span>`:'4-digit year, e.g. 14/01/1995';const ws=check(1).w;$('#h-nin').innerHTML=ws.filter(x=>x.startsWith('Applicant')).map(x=>`<div class="warn">⚠ ${esc(x.replace('Applicant ',''))}</div>`).join('');$('#h-gender').textContent=S.genderFromNin?'Filled from the NIN':''}
+ if(i===4&&$('#h-afDown')){const v=+S.afValue,dn=+S.afDown;$('#h-afDown').innerHTML=v&&dn?`${Math.round(dn/v*100)}% of asset value \u00b7 loan needed: UGX ${fmt(Math.max(0,v-dn))}${dn/v<.2?' <span class="warn">below the recommended 20%</span>':''}`:'Recommended: at least 20% of asset value'}
+ if(i===0&&$('#h-amount')&&S.amount)$('#h-amount').innerHTML=`${esc(S.currency)} ${fmt(S.amount)}${prod()[3]?` · limits UGX ${fmt(prod()[3])} to ${fmt(prod()[4])}`:''}`}
+function setK(k,v){
+ if(['amount','tenor','dependants','years','income','cost','own','afValue','afDown'].includes(k))v=v.replace(/\D/g,'');
+ if(['phone','spPhone','kinPhone','sPhone'].includes(k))v=v.replace(/\D/g,'').replace(/^(256|0)/,'').slice(0,9);
+ if(k==='nin'||k==='spNin')v=v.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,14);
+ if(k==='dob'){const d=v.replace(/\D/g,'').slice(0,8);v=d.length>4?d.slice(0,2)+'/'+d.slice(2,4)+'/'+d.slice(4):d.length>2?d.slice(0,2)+'/'+d.slice(2):d}
+ S[k]=v;if(k==='nin'&&/^[CPRA][MF]/.test(v)&&(!S.gender||S.genderFromNin)){S.gender=v[1]==='M'?'Male':'Female';S.genderFromNin=true}
+ return v}
+document.addEventListener('input',ev=>{const t=ev.target;if(t.dataset.k){const v=setK(t.dataset.k,t.value);if(t.value!==v)t.value=v;live();save()}if(t.dataset.loan){let v=t.value;if(t.dataset.lk!=='lender'&&t.dataset.lk!=='type')v=v.replace(/\D/g,'');t.value=v;S.loans[+t.dataset.loan][t.dataset.lk]=v;live();save()}});
+document.addEventListener('change',ev=>{const t=ev.target;if(t.tagName==='SELECT'&&t.dataset.k){S[t.dataset.k]=t.value;S.touched[t.dataset.k]=1;save();if(['marital','kinRel','afCat','vMake'].includes(t.dataset.k)){render();return}live()}if(t.tagName==='SELECT'&&t.dataset.loan){S.loans[+t.dataset.loan].type=t.value;save()}if(t.id==='same'){S.sameAddr=t.checked;save();render()}
+ if(t.dataset.doc)readDoc(t)});
+document.addEventListener('focusout',ev=>{const k=ev.target.dataset?.k;if(k){S.touched[k]=1;live()}});
+document.addEventListener('click',ev=>{const b=ev.target.closest('button');if(!b)return;const d=b.dataset;
+ if(d.who){if(S.who!==d.who){S.who=d.who;S.product='';S.amount='';S.tenor=''}save();render()}
+ else if(d.prod){S.product=d.prod;save();render()}
+ else if(d.chip){const k=d.chip;if(d.multi){S[k]=S[k].includes(d.v)?S[k].filter(x=>x!==d.v):[...S[k],d.v]}else{S[k]=d.v;if(k==='gender')S.genderFromNin=false}S.touched[k]=1;save();if(['active','incomeSrc','ownership','currency','afCond'].includes(k)){if(k==='afCond'&&!(S.afCat==='Vehicle'&&d.v==='New'))S.afUse='';{if(k==='active'&&d.v==='Yes'&&!S.loans.length)S.loans.push({type:'',lender:'',balance:'',monthly:'',months:''});render()}}else{document.querySelectorAll(`[data-chip="${k}"]`).forEach(x=>x.setAttribute('aria-pressed',d.multi?S[k].includes(x.dataset.v):S[k]===x.dataset.v));live()}}
+ else if(d.go!==undefined){if(S.ref)return;S.step=+d.go;render();scrollTo(0,0)}
+ else if(d.con!==undefined){S.cons[d.con]={v:d.v,t:now(),by:S.behalf?'read aloud and recorded by agent test.derwal':'self-filled by borrower'};save();render()}
+ else if(d.clear){S[d.clear]=false;delete sig[d.clear];save();initSigs();live()}
+ else if(d.follow){S.docs[d.follow+'_f']=!S.docs[d.follow+'_f'];save();render()}
+ else if(d.rmloan!==undefined){S.loans.splice(+d.rmloan,1);if(!S.loans.length)S.active='';save();render()}
+ else if(b.id==='addloan'){S.loans.push({type:'',lender:'',balance:'',monthly:'',months:''});save();render()}
+ else if(b.id==='pin'||b.id==='pinout'){const out=b.id==='pinout';const r=()=>(Math.random()-.5)*.02;S.gps=out?{lat:(28.4283+r()).toFixed(4),lon:(77.0473+r()).toFixed(4),acc:40,out:1}:{lat:(0.3476+r()).toFixed(4),lon:(32.5825+r()).toFixed(4),acc:12,out:0};S.touched.gps=1;save();render()}
+ else if(b.id==='next'){const c=check(S.step);if(Object.keys(c.e).length){S.tried[S.step]=1;live();const f=document.querySelector('.bad');if(f)f.scrollIntoView({block:'center',behavior:'smooth'});return}
+  if(S.step===7){const bad=[0,1,2,3,4,5,6].find(j=>Object.keys(check(j).e).length);if(bad!==undefined){S.step=bad;S.tried[bad]=1;render();return}const t=new Date();S.ref='MK-'+String(t.getMonth()+1).padStart(2,'0')+String(t.getDate()).padStart(2,'0')+'-'+String(Math.floor(Math.random()*90)+10);save();render();scrollTo(0,0);return}
+  S.step++;S.max=Math.max(S.max,S.step);save();render();scrollTo(0,0)}
+ else if(b.id==='back'&&S.step>0){S.step--;render();scrollTo(0,0)}
+ else if(b.id==='copy'){navigator.clipboard?.writeText(S.ref).then(()=>$('#copied').textContent='Copied',()=>$('#copied').textContent='Copy blocked here: select the reference above')}
+ else if(b.id==='again'||b.id==='reset'){S=blank();sig={};try{localStorage.removeItem('afk-proto')}catch(e){}$('#saved').textContent='Not saved yet';render();scrollTo(0,0)}});
+$('#behalf').addEventListener('change',e=>{S.behalf=e.target.checked;save();render()});
+$('#shownotes').addEventListener('change',e=>{S.notes=e.target.checked;save();render()});
+function readDoc(inp){const k=inp.dataset.doc,t=inp.dataset.t,f=inp.files[0];if(!f)return;const kb=Math.max(1,Math.round(f.size/1024)),isPdf=f.type==='application/pdf'||/\.pdf$/i.test(f.name),isImg=f.type.startsWith('image/');
+ const done=bad=>{S.docs[k]={name:f.name,kb,bad:bad||''};S.touched['doc_'+k]=1;save();render()};
+ if(t==='pdf'&&!isPdf)return done('This slot takes the PDF the bank sent, not a photo');if(t==='img'&&!isImg)return done('This slot takes a photo');
+ if(!isImg)return done('');const u=URL.createObjectURL(f),im=new Image();im.onload=()=>{const c=document.createElement('canvas');c.width=48;c.height=48;const x=c.getContext('2d');x.drawImage(im,0,0,48,48);const px=x.getImageData(0,0,48,48).data;let s=0,s2=0;for(let j=0;j<px.length;j+=4){const l=.2126*px[j]+.7152*px[j+1]+.0722*px[j+2];s+=l;s2+=l*l}const n=px.length/4,m=s/n,sd=Math.sqrt(s2/n-m*m);URL.revokeObjectURL(u);done(m<28?'Photo is too dark: retake it with more light':sd<6?'Photo looks blank: retake it':'')};im.onerror=()=>done('Could not read this photo');im.src=u}
+function initSigs(){document.querySelectorAll('canvas[data-sig]').forEach(cv=>{const k=cv.dataset.sig,r=cv.getBoundingClientRect(),dpr=devicePixelRatio||1;cv.width=r.width*dpr;cv.height=r.height*dpr;const x=cv.getContext('2d');x.scale(dpr,dpr);x.lineWidth=2.5;x.lineCap='round';x.strokeStyle=getComputedStyle(document.body).color;
+ if(sig[k]){const im=new Image();im.onload=()=>x.drawImage(im,0,0,r.width,r.height);im.src=sig[k]}else{x.fillStyle=getComputedStyle(cv).borderColor;x.font='15px IBM Plex Sans, sans-serif';x.fillText('Sign here',14,r.height-14)}
+ let on=false;cv.onpointerdown=e=>{on=true;if(!S[k]){x.clearRect(0,0,r.width,r.height)}x.beginPath();x.moveTo(e.offsetX,e.offsetY);cv.setPointerCapture(e.pointerId)};cv.onpointermove=e=>{if(!on)return;x.lineTo(e.offsetX,e.offsetY);x.stroke()};cv.onpointerup=()=>{if(!on)return;on=false;S[k]=true;sig[k]=cv.toDataURL();S.touched[k]=1;save();live()}})}
+function start(d){if(d&&d.step!==undefined)S=Object.assign(blank(),d);else{try{const j=localStorage.getItem('afk-proto');if(j)S=Object.assign(blank(),JSON.parse(j))}catch(e){}}S.sigA=false;S.sigB=false;if(S.savedAt)$('#saved').textContent='Saved on this device · '+S.savedAt;render()}
+window.claude?.hot?.snapshot?.(()=>S);
+window.claude?.hot?.ready?window.claude.hot.ready(start):start(window.claude?.hot?.data??{});
+}
+</script>
+</body>
+</html>
